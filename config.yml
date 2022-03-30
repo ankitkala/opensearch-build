@@ -1,0 +1,9 @@
+Description: Configuration file to store constants required to run rally for performance test
+Constants:
+  Repository: https://github.com/ankitkala/opensearch-infra
+  SecurityGroupId: sg-0d702dced88f45448
+  VpcId: vpc-0da55b2351fd27209
+  AccountId: 751998301636
+  Region: eu-west-1
+  Role: cfn-set-up
+  PublicIp: enable
