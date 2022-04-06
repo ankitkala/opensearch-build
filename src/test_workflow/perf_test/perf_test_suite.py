@@ -38,8 +38,10 @@ class PerfTestSuite:
             with WorkingDirectory(current_workspace):
                 subprocess.check_call("pipenv install", cwd=current_workspace, shell=True)
                 if self.security:
+                    print(self.command)
                     subprocess.check_call(f"{self.command} -s", cwd=current_workspace, shell=True)
                 else:
+                    print(self.command)
                     subprocess.check_call(f"{self.command}", cwd=current_workspace, shell=True)
         finally:
             os.chdir(self.current_workspace)
