@@ -18,6 +18,7 @@ from test_workflow.perf_test.perf_args import PerfArgs
 from test_workflow.perf_test.perf_test_cluster import PerfTestCluster
 from test_workflow.perf_test.perf_test_runner import PerfTestRunner
 from test_workflow.perf_test.perf_test_suite import PerfTestSuite
+from test_workflow.perf_test.perf_test_cluster_config import PerfTestClusterConfig
 
 
 class PerfTestRunnerOpenSearch(PerfTestRunner):
@@ -29,6 +30,7 @@ class PerfTestRunnerOpenSearch(PerfTestRunner):
         logging.info("Running opensearch tests")
 
     def get_infra_repo_url(self):
+        return "https://github.com/ankitkala/opensearch-infra.git"
         if "GITHUB_TOKEN" in os.environ:
             return "https://${GITHUB_TOKEN}@github.com/opensearch-project/opensearch-infra.git"
         return "https://github.com/opensearch-project/opensearch-infra.git"
@@ -38,8 +40,8 @@ class PerfTestRunnerOpenSearch(PerfTestRunner):
         with TemporaryDirectory(keep=self.args.keep, chdir=True) as work_dir:
             current_workspace = os.path.join(work_dir.name, "infra")
             logging.info("current_workspace is " + str(current_workspace))
-            with GitRepository(self.get_infra_repo_url(), "main", current_workspace):
+            with GitRepository(self.get_infra_repo_url(), "ccr-perf", current_workspace):
                 with WorkingDirectory(current_workspace):
-                    with PerfTestCluster.create(self.test_manifest, config, self.args.stack, self.security, current_workspace) as test_cluster:
-                        perf_test_suite = PerfTestSuite(self.test_manifest, test_cluster.endpoint(), self.security, current_workspace, self.tests_dir, self.args)
+                    with PerfTestCluster.create(self.test_manifest, config, self.args.stack, PerfTestClusterConfig(self.security), current_workspace) as test_cluster:
+                        perf_test_suite = PerfTestSuite(self.test_manifest, test_cluster.endpoint_with_port(), self.security, current_workspace, self.tests_dir, self.args)
                         retry_call(perf_test_suite.execute, tries=3, delay=60, backoff=2)
