@@ -35,6 +35,7 @@ class PerfTestCluster(TestCluster):
         self.params = "".join(params_list) + role_params
         self.is_endpoint_public = False
         self.cluster_endpoint_with_port = None
+        self.endpoint = None
 
     def start(self):
         os.chdir(self.work_dir)
@@ -43,7 +44,7 @@ class PerfTestCluster(TestCluster):
         subprocess.check_call(command, cwd=os.getcwd(), shell=True)
         with open(self.output_file, "r") as read_file:
             load_output = json.load(read_file)
-        self.cluster_endpoint_with_port = self.create_endpoint(load_output)
+            self.create_endpoint(load_output)
 
 
     def create_endpoint(self, cdk_output):
@@ -52,25 +53,27 @@ class PerfTestCluster(TestCluster):
             print("Single node cluster")
             private_ip = cdk_output[self.stack_name]["PrivateIp"]
             public_ip = cdk_output[self.stack_name].get("PublicIp", None)
-            print(private_ip)
-            print(public_ip)
             self.is_endpoint_public = public_ip is not None
             host = public_ip if public_ip is not None else private_ip
-            print(host)
         else:
             print("multi node cluster")
-            host = cdk_output[self.stack_name]["Load Balancer Endpoint"]
+            host = cdk_output[self.stack_name]["LoadBalancerEndpoint"]
             print(host)
             self.is_endpoint_public = True
 
         if host is not None:
             print("host not none")
+            self.endpoint = host
             self.cluster_endpoint_with_port = "".join([scheme, host, ":", str(self.port())])
             print(self.cluster_endpoint_with_port)
 
     def endpoint_with_port(self):
-        print("endpoint called")
+        print("endpoint called. Returning: ")
+        print(self.cluster_endpoint_with_port)
         return self.cluster_endpoint_with_port
+
+    def endpoint(self):
+        return self.endpoint
 
     def port(self):
         return 443 if self.cluster_config.security else 80
@@ -90,6 +93,9 @@ class PerfTestCluster(TestCluster):
     def wait_for_processing(self, tries=3, delay=15, backoff=2):
         # Should be invoked only if the endpoint is public.
         assert self.is_endpoint_public
+        print("calling from wait_for_processing")
+        vallue = self.endpoint_with_port()
+        print(vallue)
         url = "".join([self.endpoint_with_port(), "/_cluster/health"])
         retry_call(requests.get, fkwargs={"url": url, "auth": HTTPBasicAuth('admin', 'admin'), "verify": False},
                    tries=tries, delay=delay, backoff=backoff)
@@ -118,10 +124,10 @@ class PerfTestCluster(TestCluster):
                 "cluster_stack_name": self.stack_name,
                 "security": "enable" if self.cluster_config.security else "disable",
                 "architecture": self.manifest.build.architecture,
-                "master_node_count": self.cluster_config.data_nodes,
-                "data_node_count": self.cluster_config.master_nodes,
-                "ingest_node_count": self.cluster_config.ingest_nodes,
-                "client_node_count": self.cluster_config.client_nodes
+                "master_node_count": int(self.cluster_config.data_nodes),
+                "data_node_count": int(self.cluster_config.master_nodes),
+                "ingest_node_count": int(self.cluster_config.ingest_nodes),
+                "client_node_count": int(self.cluster_config.client_nodes)
             }
     @classmethod
     @contextmanager
