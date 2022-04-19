@@ -9,7 +9,7 @@ pipeline {
         AGENT_LABEL = 'Jenkins-Agent-al2-x64-c54xlarge-Docker-Host'
         AGENT_IMAGE = 'opensearchstaging/ci-runner:ci-runner-centos7-v1'
         BUNDLE_MANIFEST = 'bundle-manifest.yml'
-        JOB_NAME = 'perf-test'
+        JOB_NAME = if COMPONENT_TO_TEST != "" ? COMPONENT_TO_TEST + "-perf-test" : 'perf-test'
     }
     parameters {
         string(
@@ -111,7 +111,8 @@ pipeline {
                                 insecure: false,
                                 workload: TEST_WORKLOAD,
                                 testIterations: TEST_ITERATIONS,
-                                warmupIterations: WARMUP_ITERATIONS)
+                                warmupIterations: WARMUP_ITERATIONS,
+                                component: COMPONENT_TO_TEST)
 
                             lib.jenkins.Messages.new(this).add(JOB_NAME,
                                 lib.jenkins.Messages.new(this).get([JOB_NAME]) +
@@ -162,7 +163,8 @@ pipeline {
                                 insecure: true,
                                 workload: TEST_WORKLOAD,
                                 testIterations: TEST_ITERATIONS,
-                                warmupIterations: WARMUP_ITERATIONS)
+                                warmupIterations: WARMUP_ITERATIONS,
+                                component: COMPONENT_TO_TEST)
 
                             lib.jenkins.Messages.new(this).add(JOB_NAME,
                                 lib.jenkins.Messages.new(this).get([JOB_NAME]) +
