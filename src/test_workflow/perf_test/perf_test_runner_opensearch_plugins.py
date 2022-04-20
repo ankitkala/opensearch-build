@@ -25,10 +25,11 @@ class PerfTestRunnerOpenSearchPlugins(PerfTestRunner):
         super().__init__(args, test_manifest)
         self.tests_dir = os.path.join(os.getcwd(), "test-results", "perf-test", self.args.component)
         os.makedirs(self.tests_dir, exist_ok=True)
+        security_flag = "--without-security" if not self.security else ""
         self.command = (
             f"./run_perf_test.sh --config {str(os.path.abspath(self.args.config.name))} "
             f"--bundle-manifest {str(os.path.abspath(self.args.bundle_manifest.name))} "
-            f"--test-result-dir {str(self.tests_dir)} --security {self.security}"
+            f"--test-result-dir {str(self.tests_dir)} {security_flag}"
         )
 
     def get_plugin_repo_url(self):
