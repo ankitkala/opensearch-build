@@ -28,7 +28,7 @@ class PerfTestRunnerOpenSearchPlugins(PerfTestRunner):
         self.command = (
             f"./run_perf_test.sh --config {str(os.path.abspath(self.args.config.name))} "
             f"--bundle-manifest {str(os.path.abspath(self.args.bundle_manifest.name))} "
-            f"--test-result-dir {str(self.tests_dir)} "
+            f"--test-result-dir {str(self.tests_dir)} --security {self.security}"
         )
 
     def get_plugin_repo_url(self):
