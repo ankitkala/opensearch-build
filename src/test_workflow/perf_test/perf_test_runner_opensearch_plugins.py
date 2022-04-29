@@ -31,11 +31,11 @@ class PerfTestRunnerOpenSearchPlugins(PerfTestRunner):
         )
 
     def get_plugin_repo_url(self):
-        return f"https://github.com/ankitkala/{self.args.component}.git"
+        return f"https://github.com/opensearch-project/{self.args.component}.git"
 
     def run_tests(self):
         with TemporaryDirectory(keep=self.args.keep, chdir=True) as work_dir:
             current_workspace = os.path.join(work_dir.name, self.args.component)
-            with GitRepository(self.get_plugin_repo_url(), "jenkins", current_workspace):
+            with GitRepository(self.get_plugin_repo_url(), "main", current_workspace):
                 with WorkingDirectory(current_workspace):
                     subprocess.check_call(f"{self.command}", cwd=os.getcwd(), shell=True)
