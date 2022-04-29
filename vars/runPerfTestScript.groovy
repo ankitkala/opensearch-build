@@ -4,7 +4,7 @@ void call(Map args = [:]) {
 
     install_dependencies()
     install_opensearch_infra_dependencies()
-    config_name = isNullOrEmpty(args.conig) ? "config.yml" : args.config
+    config_name = isNullOrEmpty(args.config) ? "config.yml" : args.config
     withAWS(role: 'opensearch-test', roleAccount: "${AWS_ACCOUNT_PUBLIC}", duration: 900, roleSessionName: 'jenkins-session') {
         s3Download(file: "config.yml", bucket: "${ARTIFACT_BUCKET_NAME}", path: "${PERF_TEST_CONFIG_LOCATION}/${config_name}", force: true)
     }
