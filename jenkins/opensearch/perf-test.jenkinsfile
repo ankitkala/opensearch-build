@@ -112,7 +112,7 @@ pipeline {
                                 workload: TEST_WORKLOAD,
                                 testIterations: TEST_ITERATIONS,
                                 warmupIterations: WARMUP_ITERATIONS,
-                                config: "config-ccr.yml")
+                                config: "config.yml")
 
                             lib.jenkins.Messages.new(this).add(JOB_NAME,
                                 lib.jenkins.Messages.new(this).get([JOB_NAME]) +

@@ -79,7 +79,7 @@ pipeline {
                         buildId: BUILD_ID,
                         architecture: ARCHITECTURE,
                         component: "cross-cluster-replication",
-                        config: "config-ccr.yml")
+                        config: "config.yml")
 
                     lib.jenkins.Messages.new(this).add(JOB_NAME,
                         lib.jenkins.Messages.new(this).get([JOB_NAME]) +
